@@ -8,23 +8,6 @@ from schemas import AlertResponse
 
 router = APIRouter(prefix="/alerts", tags=["Alerts"])
 
-
-# 🔹 GET alerts with filtering
-@router.get("/", response_model=List[AlertResponse])
-# def get_alerts(
-#     status: str = Query(None),
-#     severity: str = Query(None),
-#     db: Session = Depends(get_db)
-# ):
-#     query = db.query(Alert)
-
-#     if status:
-#         query = query.filter(Alert.status == status.upper())
-
-#     if severity:
-#         query = query.filter(Alert.severity == severity.upper())
-
-#     return query.order_by(Alert.id.desc()).all()
 @router.get("/", response_model=List[AlertResponse])
 def get_alerts( # added pagination
     status: str = Query(None), 
@@ -43,7 +26,7 @@ def get_alerts( # added pagination
 
     return query.order_by(Alert.id.desc()).offset(offset).limit(limit).all()
 
-# 🔹 Resolve alert
+# Resolve alert
 @router.patch("/{alert_id}/resolve")
 def resolve_alert(alert_id: int, db: Session = Depends(get_db)):
     alert = db.query(Alert).filter(Alert.id == alert_id).first()
