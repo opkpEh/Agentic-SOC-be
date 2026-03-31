@@ -10,7 +10,6 @@ from config import WEBHOOK_URL, recent_threshold_days
 
 app = FastAPI()
 
-# ✅ Setup credentials once
 creds = json.loads(os.environ["GOOGLE_CREDS"])
 
 credentials = Credentials.from_service_account_info(
@@ -23,7 +22,6 @@ credentials = Credentials.from_service_account_info(
 
 client = gspread.authorize(credentials)
 
-# ✅ Lazy sheet access (important)
 def get_sheet():
     return client.open_by_key("1pz0k4MUBUVreH-yC-H3D2ZYAqfbZys2ef-kafEGFOJI").sheet1
 
@@ -42,7 +40,7 @@ async def send_alert(body: dict = Body(...)):
 
 @app.get("/get-user-history")
 def get_user_history(user: str = Query(...)):
-    sheet = get_sheet()  # ✅ FIX
+    sheet = get_sheet() 
     records = sheet.get_all_records()
 
     user_records = [r for r in records if r.get("User") == user]
