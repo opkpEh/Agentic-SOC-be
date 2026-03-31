@@ -1,7 +1,6 @@
 import os
 import json
 import gspread
-from mangum import Mangum
 from fastapi import FastAPI, Body, Query
 from datetime import datetime, timedelta
 from google.oauth2.service_account import Credentials
@@ -91,5 +90,3 @@ def get_user_history(user: str = Query(...)):
         "high_severity_count": high_severity,
         "risk_score": risk_score
     }
-
-handler = Mangum(app)
