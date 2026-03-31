@@ -1,15 +1,16 @@
 import os
 import json
 import gspread
+from mangum import Mangum
 from fastapi import FastAPI, Body, Query
 from datetime import datetime, timedelta
 from google.oauth2.service_account import Credentials
-from mangum import Mangum
+
 from helpers import enrich, parse_log, parse_date, process_pipeline
 from config import WEBHOOK_URL, recent_threshold_days
 
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 creds = json.loads(os.environ["GOOGLE_CREDS"])
 
@@ -92,3 +93,5 @@ def get_user_history(user: str = Query(...)):
     }
 
 handler = Mangum(app)
+def main(request, context):
+    return handler(request, context)
