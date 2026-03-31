@@ -1,4 +1,8 @@
 import re
+import hashlib
+import httpx
+from datetime import datetime
+from config import TRUSTED_IPS, INTERNAL_PREFIXES, KNOWN_DEVICES, WEBHOOK_URL
 
 def parse_log(log: str) -> dict:
     timestamp = datetime.utcnow().isoformat()
@@ -102,3 +106,35 @@ def enrich(alert: dict):
     })
 
     return alert
+
+def is_internal_ip(ip: str) -> bool:
+    if ip in TRUSTED_IPS:
+        return True
+    return any(ip.startswith(prefix) for prefix in INTERNAL_PREFIXES)
+
+
+def generate_session_id(ip, user, host):
+    time_bucket = int(datetime.utcnow().timestamp() // 300)
+    raw = f"{ip}|{user}|{host}|{time_bucket}"
+    return hashlib.sha1(raw.encode()).hexdigest()
+
+
+async def process_pipeline(log: str):
+    parsed = parse_log(log)
+    enriched = enrich(parsed)
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(WEBHOOK_URL, json=enriched)
+
+    return {
+        "status": "processed",
+        "webhook_status": response.status_code
+    }
+
+def parse_date(date_str):
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(date_str, fmt)
+        except:
+            continue
+    return None

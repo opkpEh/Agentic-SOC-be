@@ -12,3 +12,5 @@ INTERNAL_PREFIXES = {
 }
 
 KNOWN_DEVICES = set()
+
+recent_threshold_days= 1
