@@ -9,7 +9,6 @@ from google.oauth2.service_account import Credentials
 from helpers import enrich, parse_log, parse_date, process_pipeline
 from config import WEBHOOK_URL, recent_threshold_days
 
-handler = Mangum(app)
 
 app = FastAPI()
 
@@ -92,3 +91,5 @@ def get_user_history(user: str = Query(...)):
         "high_severity_count": high_severity,
         "risk_score": risk_score
     }
+
+handler = Mangum(app)
