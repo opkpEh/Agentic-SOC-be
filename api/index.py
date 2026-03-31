@@ -1,12 +1,15 @@
 import os
 import json
 import gspread
+from mangum import Mangum
 from fastapi import FastAPI, Body, Query
 from datetime import datetime, timedelta
 from google.oauth2.service_account import Credentials
 
 from helpers import enrich, parse_log, parse_date, process_pipeline
 from config import WEBHOOK_URL, recent_threshold_days
+
+handler = Mangum(app)
 
 app = FastAPI()
 
