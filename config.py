@@ -1,4 +1,4 @@
-WEBHOOK_URL = "https://devcohort.space/webhook-test/24e82c6b-baa1-43a9-a5c2-9446b4097924"
+WEBHOOK_URL = "https://devcohort.space/webhook-test/ae6e5156-98a0-4fc4-b250-1b4db6e9f109"
 
 TRUSTED_IPS = {
     "10.10.10.5",
