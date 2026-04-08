@@ -52,13 +52,22 @@ async def send_alert_manual(body: dict = Body(...)):
     }
 
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(WEBHOOK_URL_TESTING, json=payload)
+        data = json.dumps(payload).encode("utf-8")
+
+        req = urllib.request.Request(
+            WEBHOOK_URL_TESTING,
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+
+        with urllib.request.urlopen(req) as response:
+            response_body = response.read().decode()
 
         return {
             "status": "sent",
-            "webhook_status_code": response.status_code,
-            "webhook_response": response.text
+            "webhook_status_code": response.getcode(),
+            "webhook_response": response_body
         }
 
     except Exception as e:
