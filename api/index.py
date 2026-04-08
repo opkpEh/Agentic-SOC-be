@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from google.oauth2.service_account import Credentials
 
 from helpers import enrich, parse_log, parse_date, process_pipeline
-from config import WEBHOOK_URL, recent_threshold_days
+from config import WEBHOOK_URL, recent_threshold_days , WEBHOOK_URL_TESTING
 
 
 app = FastAPI()
