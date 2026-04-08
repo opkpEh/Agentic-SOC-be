@@ -42,7 +42,31 @@ async def send_alert(body: dict = Body(...)):
     result = await process_pipeline(log)
     return result
 
+@app.post("/send-alert-manual")
+async def send_alert_manual(body: dict = Body(...)):
+    log = body.get("log", "")
 
+    payload = {
+        "log": log,
+        "source": "manual_test"
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(WEBHOOK_URL_TESTING, json=payload)
+
+        return {
+            "status": "sent",
+            "webhook_status_code": response.status_code,
+            "webhook_response": response.text
+        }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+        
 @app.get("/get-user-history")
 def get_user_history(user: str = Query(...)):
     sheet = get_sheet() 
