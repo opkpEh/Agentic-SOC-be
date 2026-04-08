@@ -28,6 +28,8 @@ def get_sheet():
     # user history
     return client.open_by_key("1pz0k4MUBUVreH-yC-H3D2ZYAqfbZys2ef-kafEGFOJI").sheet1
 
+def get_alert_sheet():
+    return client.open_by_key("1t8DDSoJ3-YTvvQgPt11yW6mqcGpqKQh4VTThUq0vVuc").sheet1
 
 @app.get("/")
 def root():
@@ -122,6 +124,60 @@ async def update_user_history(body: dict = Body(...)):
     return {
         "status": "success",
         "message": "Row added to user_history"
+    }
+
+@app.post("/update-alert-record")
+async def update_alert_record(body: dict = Body(...)):
+    sheet = get_alert_sheet()
+
+    AlertID = body.get("AlertID", "")
+    Date = body.get("Date", "")
+    User = body.get("User", "")
+    Role = body.get("Role", "")
+    Event = body.get("Event", "")
+    SourceIP = body.get("SourceIP", "")
+    Service = body.get("Service", "")
+    Outcome = body.get("Outcome", "")
+
+    Severity = body.get("severity", "")
+    Noise = body.get("noise", "")
+    RequiresInvestigation = body.get("requires_investigation", "")
+
+    Summary = body.get("summary", "")
+    Reasoning = body.get("reasoning", "")
+    Risk = body.get("risk", "")
+    Confidence = body.get("confidence", "")
+
+    Status = "open" if RequiresInvestigation else "no action"
+    Comments = Summary + " | " + Reasoning
+    LastUpdated = Date
+
+    row = [
+        AlertID,
+        Date,
+        User,
+        Role,
+        Event,
+        SourceIP,
+        Service,
+        Outcome,
+        Severity,
+        Noise,
+        RequiresInvestigation,
+        Summary,
+        Reasoning,
+        Risk,
+        Confidence,
+        Status,
+        Comments,
+        LastUpdated
+    ]
+
+    sheet.append_row(row)
+
+    return {
+        "status": "success",
+        "message": "Alert recorded"
     }
 
 handler = Mangum(app)
