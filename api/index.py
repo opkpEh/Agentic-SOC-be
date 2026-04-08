@@ -1,6 +1,7 @@
 import os
 import json
 import gspread
+import urllib.request
 from mangum import Mangum
 from fastapi import FastAPI, Body, Query
 from datetime import datetime, timedelta
