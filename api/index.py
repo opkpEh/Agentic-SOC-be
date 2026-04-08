@@ -25,6 +25,7 @@ credentials = Credentials.from_service_account_info(
 client = gspread.authorize(credentials)
 
 def get_sheet():
+    # user history
     return client.open_by_key("1pz0k4MUBUVreH-yC-H3D2ZYAqfbZys2ef-kafEGFOJI").sheet1
 
 
@@ -90,6 +91,37 @@ def get_user_history(user: str = Query(...)):
         "failed_logins": failed_logins,
         "high_severity_count": high_severity,
         "risk_score": risk_score
+    }
+
+@app.post("/update-user-history")
+async def update_user_history(body: dict = Body(...)):
+    sheet = get_sheet()
+
+    AlertID = body.get("AlertID", "")
+    User = body.get("User", "")
+    Role = body.get("Role", "")
+    Event = body.get("Event", "")
+    Date = body.get("Date", "")
+    Summary = body.get("summary", "")
+    Risk = body.get("risk", "")
+    Confidence = body.get("confidence", "")
+
+    row = [
+        AlertID,
+        User,
+        Role,
+        Event,
+        Date,
+        Summary,
+        Risk,
+        Confidence
+    ]
+
+    sheet.append_row(row)
+
+    return {
+        "status": "success",
+        "message": "Row added to user_history"
     }
 
 handler = Mangum(app)
