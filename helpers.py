@@ -3,6 +3,8 @@ import hashlib
 import httpx
 from datetime import datetime
 from config import TRUSTED_IPS, INTERNAL_PREFIXES, KNOWN_DEVICES, WEBHOOK_URL
+from dateutil import parser as dateutil_parser
+from datetime import datetime, timezone
 
 def parse_log(log: str) -> dict:
     timestamp = datetime.utcnow().isoformat()
@@ -137,13 +139,16 @@ def parse_date(date_str):
     if not date_str or str(date_str).strip().lower() in ["unknown", "none", ""]:
         return None
     date_str = str(date_str).strip()
-    # Handle unix timestamps
     try:
         ts = float(date_str)
         return datetime.fromtimestamp(ts)
     except ValueError:
         pass
     try:
-        return dateutil_parser.parse(date_str, dayfirst=True)
+        parsed = dateutil_parser.parse(date_str, dayfirst=True)
+        # Strip timezone so it's always naive, matching datetime.utcnow()
+        return parsed.replace(tzinfo=None)
+    except Exception:
+        return None
     except Exception:
         return None
