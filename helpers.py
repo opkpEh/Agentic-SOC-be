@@ -131,10 +131,19 @@ async def process_pipeline(log: str):
         "webhook_status": response.status_code
     }
 
+from dateutil import parser as dateutil_parser
+
 def parse_date(date_str):
-    for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
-        try:
-            return datetime.strptime(date_str, fmt)
-        except:
-            continue
-    return None
+    if not date_str or str(date_str).strip().lower() in ["unknown", "none", ""]:
+        return None
+    date_str = str(date_str).strip()
+    # Handle unix timestamps
+    try:
+        ts = float(date_str)
+        return datetime.fromtimestamp(ts)
+    except ValueError:
+        pass
+    try:
+        return dateutil_parser.parse(date_str, dayfirst=True)
+    except Exception:
+        return None
