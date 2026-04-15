@@ -79,10 +79,10 @@ async def send_alert_manual(body: dict = Body(...)):
         
 @app.get("/get-user-history")
 def get_user_history(user: str = Query(...)):
-    sheet = get_sheet() 
+    sheet = get_sheet()
     records = sheet.get_all_records()
 
-    user_records = [r for r in records if r.get("User") == user]
+    user_records = [r for r in records if str(r.get("User", "")).strip() == user.strip()]
 
     if not user_records:
         return {
@@ -102,9 +102,9 @@ def get_user_history(user: str = Query(...)):
     high_severity = 0
 
     for r in user_records:
-        date_str = r.get("Date")
-        severity = r.get("Severity", "").upper()
-        event = r.get("Event", "").lower()
+        date_str = str(r.get("Date", "")).strip()
+        event = str(r.get("Event", "")).lower().strip()
+        risk = str(r.get("Risk", "")).upper().strip()
 
         event_time = parse_date(date_str)
         if not event_time:
@@ -116,7 +116,7 @@ def get_user_history(user: str = Query(...)):
         if "failed" in event:
             failed_logins += 1
 
-        if severity in ["HIGH", "CRITICAL"]:
+        if risk in ["HIGH", "CRITICAL"]:
             high_severity += 1
 
     risk_score = min(100, (failed_logins * 5 + high_severity * 15))
