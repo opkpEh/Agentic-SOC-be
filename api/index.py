@@ -104,7 +104,8 @@ def get_user_history(user: str = Query(...)):
     for r in user_records:
         date_str = str(r.get("Date", "")).strip()
         event = str(r.get("Event", "")).lower().strip()
-        risk = str(r.get("Risk", "")).upper().strip()
+        summary = str(r.get("Summary", "")).lower().strip()
+        risk = str(r.get("Risk", "")).lower().strip()
 
         event_time = parse_date(date_str)
         if not event_time:
@@ -113,10 +114,13 @@ def get_user_history(user: str = Query(...)):
         if event_time >= recent_threshold:
             recent_alerts += 1
 
-        if "failed" in event:
+        # Check event AND summary since Event column appears empty
+        combined_text = event + " " + summary
+        if "failed" in combined_text:
             failed_logins += 1
 
-        if risk in ["HIGH", "CRITICAL"]:
+        # Risk is a sentence, check for keywords instead of exact match
+        if any(word in risk for word in ["high", "critical", "unauthorized", "suspicious", "escalation"]):
             high_severity += 1
 
     risk_score = min(100, (failed_logins * 5 + high_severity * 15))
