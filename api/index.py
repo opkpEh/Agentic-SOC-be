@@ -160,6 +160,27 @@ async def update_user_history(body: dict = Body(...)):
         "message": "Row added to user_history"
     }
 
+@app.get("/debug-user")
+def debug_user(user: str = Query(...)):
+    sheet = get_sheet()
+    records = sheet.get_all_records()
+    user_records = [r for r in records if str(r.get("User", "")).strip() == user.strip()]
+    
+    debug = []
+    for r in user_records:
+        date_str = str(r.get("Date", "")).strip()
+        event = str(r.get("Event", "")).lower().strip()
+        risk = str(r.get("Risk", "")).upper().strip()
+        parsed = parse_date(date_str)
+        debug.append({
+            "raw_date": date_str,
+            "parsed_date": str(parsed),
+            "event": event,
+            "risk": risk
+        })
+    
+    return {"count": len(user_records), "records": debug}
+    
 @app.post("/update-alert-record")
 async def update_alert_record(body: dict = Body(...)):
     sheet = get_alert_sheet()
